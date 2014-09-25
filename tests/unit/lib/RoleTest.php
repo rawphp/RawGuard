@@ -93,9 +93,9 @@ class RoleTest extends \PHPUnit_Framework_TestCase
         
         $roles = array_values( $config[ 'roles' ] );
         
-        $this->role->init( $roles[ 0 ] );
+        $this->role->init( $roles[ 1 ] );
         
-        $this->assertEquals( 'administrator', $this->role->getName( ) );
+        $this->assertEquals( 'admin', $this->role->getName( ) );
         
         $caps = $this->role->getCaps( );
         

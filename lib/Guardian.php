@@ -55,12 +55,16 @@ class Guardian extends Component implements IGuardian
     /**
      * @var array
      */
-    public $roles               = array();
+    public $roles               = array( );
+    
+    public $useHierarchy        = FALSE;
     
     /**
      * Initialises the guardian.
      * 
      * @param array $config configuration array
+     * 
+     * @todo cleanup hierarchical capabilities
      */
     public function init( $config = NULL )
     {
@@ -77,6 +81,10 @@ class Guardian extends Component implements IGuardian
                     $this->debug = $value;
                     break;
                 
+                case 'use_hierarchy':
+                    $this->useHierarchy = ( bool )$value;
+                    break;
+                
                 case 'roles':
                     if ( !is_array( $value ) )
                     {
@@ -87,7 +95,7 @@ class Guardian extends Component implements IGuardian
                         $role = new Role( );
                         $role->init( $val );
                         
-                        $this->roles[] = $role;
+                        $this->roles[ ] = $role;
                     }
                     break;
                 
@@ -96,6 +104,35 @@ class Guardian extends Component implements IGuardian
                     break;
             }
         }
+        
+        if ( $this->useHierarchy )
+        {
+            $lastIndex = count( $this->roles ) - 1;
+            
+            $i = $lastIndex;
+            
+            while ( $i > 0 )
+            {
+                foreach( $this->roles[ $i ]->capabilities as $cap )
+                {
+                    $j = 0;
+                    
+                    while ( $j < $i )
+                    {
+                        if ( !in_array( $cap, $this->roles[ $j ]->capabilities ) )
+                        {
+                            $this->roles[ $j ]->capabilities[ ] = $cap;
+                        }
+                        
+                        $j++;
+                    }
+                }
+                
+                $i--;
+            }
+        }
+        
+        $this->doAction( self::ON_INIT_ACTION );
     }
     
     /**
@@ -135,5 +172,9 @@ class Guardian extends Component implements IGuardian
         return $this->filter( self::ON_USER_CAN_FILTER, $retVal, $user, $cap );
     }
     
+    // actions
+    const ON_INIT_ACTION                    = 'on_init_action';
+    
+    // filters
     const ON_USER_CAN_FILTER                = 'on_user_can_filter';
 }

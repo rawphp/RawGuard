@@ -37,10 +37,14 @@
 #
 ################################################################################ 
 
-class: RawPHP\RawGuard\Guardian
-debug: FALSE
+class:         RawPHP\RawGuard\Guardian
+debug:         FALSE
+use_hierarchy: TRUE
 roles:
-    - administrator:
+    - super_admin:
+        - manage_network
+        - manage_social
+    - admin:
         - add_users
         - delete_users
     - normal:

@@ -96,9 +96,36 @@ class GuardianTest extends \PHPUnit_Framework_TestCase
         
         $roles = $this->guard->getRoles( );
         
-        $this->assertEquals( 'administrator', $roles[ 0 ]->getName( ) );
-        $this->assertEquals( 'normal', $roles[ 1 ]->getName( ) );
-        $this->assertEquals( 'visitor', $roles[ 2 ]->getName( ) );
+        $this->assertEquals( 'super_admin', $roles[ 0 ]->getName( ) );
+        $this->assertEquals( 'admin', $roles[ 1 ]->getName( ) );
+        $this->assertEquals( 'normal', $roles[ 2 ]->getName( ) );
+        $this->assertEquals( 'visitor', $roles[ 3 ]->getName( ) );
+    }
+    
+    /**
+     * Test initialising hierarchical capabilities.
+     * 
+     * @global array $config configuration array
+     */
+    public function testHierarchySetup( )
+    {
+        global $config;
+        
+        $this->guard->init( $config );
+        
+        $roles = $this->guard->getRoles( );
+        
+        $visitorRole = $roles[ 3 ];
+        $this->assertEquals( 1, count( $visitorRole->getCaps( ) ) );
+        
+        $normalRole = $roles[ 2 ];
+        $this->assertEquals( 2, count( $normalRole->getCaps( ) ) );
+        
+        $adminRole = $roles[ 1 ];
+        $this->assertEquals( 4, count( $adminRole->getCaps( ) ) );
+        
+        $superAdminRole = $roles[ 0 ];
+        $this->assertEquals( 6, count( $superAdminRole->getCaps( ) ) );
     }
     
     /**
