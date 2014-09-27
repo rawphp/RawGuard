@@ -35,9 +35,6 @@
 
 namespace RawPHP\RawGuard;
 
-use RawPHP\RawBase\Component;
-use RawPHP\RawGuard\IUser;
-
 /**
  * Guardian interface.
  * 
@@ -50,5 +47,61 @@ use RawPHP\RawGuard\IUser;
  */
 interface IGuardian
 {
+    /**
+     * Initialises the guardian.
+     * 
+     * @param array $config configuration array
+     * 
+     * @todo cleanup hierarchical capabilities
+     * 
+     * @action ON_INIT_ACTION
+     */
+    public function init( $config = NULL );
     
+    /**
+     * Returns role by name.
+     * 
+     * @param string $name role name
+     * 
+     * @action ON_GET_ROLE_ACTION
+     * 
+     * @filter ON_GET_ROLE_FILTER(2)
+     * 
+     * @return Role the role
+     */
+    public function getRole( $name );
+    
+    /**
+     * Returns the current active roles.
+     * 
+     * @filter ON_GET_ROLES_FILTER(1)
+     * 
+     * @return array list of roles
+     */
+    public function getRoles( );
+    
+    /**
+     * Checks if a user can perform some action.
+     * 
+     * @param IUser  $user the user
+     * @param string $cap  the capability
+     * 
+     * @action ON_USER_CAN_ACTION
+     * 
+     * @filter ON_USER_CAN_FILTER(3)
+     * 
+     * @return bool TRUE if allowed, FALSE if not
+     */
+    public function userCan( IUser $user, $cap );
+    
+    /**
+     * Returns the pretty name for a role or capability.
+     * 
+     * @param string $name the role or capability name
+     * 
+     * @filter ON_GET_PRETTY_NAME_FILTER(2)
+     * 
+     * @return string prettified name
+     */
+    public function getPrettyName( $name );
 }

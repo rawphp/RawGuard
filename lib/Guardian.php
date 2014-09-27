@@ -65,6 +65,8 @@ class Guardian extends Component implements IGuardian
      * @param array $config configuration array
      * 
      * @todo cleanup hierarchical capabilities
+     * 
+     * @action ON_INIT_ACTION
      */
     public function init( $config = NULL )
     {
@@ -136,13 +138,45 @@ class Guardian extends Component implements IGuardian
     }
     
     /**
+     * Returns role by name.
+     * 
+     * @param string $name role name
+     * 
+     * @action ON_GET_ROLE_ACTION
+     * 
+     * @filter ON_GET_ROLE_FILTER(2)
+     * 
+     * @return Role the role
+     */
+    public function getRole( $name )
+    {
+        $retVal = NULL;
+        
+        foreach( $this->roles as $role )
+        {
+            if ( $name === $role->name )
+            {
+                $retVal = $role;
+                
+                break;
+            }
+        }
+        
+        $this->doAction( self::ON_GET_ROLE_ACTION );
+        
+        return $this->filter( self::ON_GET_ROLE_FILTER, $retVal, $name );
+    }
+    
+    /**
      * Returns the current active roles.
+     * 
+     * @filter ON_GET_ROLES_FILTER(1)
      * 
      * @return array list of roles
      */
     public function getRoles( )
     {
-        return $this->roles;
+        return $this->filter( self::ON_GET_ROLES_FILTER, $this->roles );
     }
     
     /**
@@ -150,6 +184,8 @@ class Guardian extends Component implements IGuardian
      * 
      * @param IUser  $user the user
      * @param string $cap  the capability
+     * 
+     * @action ON_USER_CAN_ACTION
      * 
      * @filter ON_USER_CAN_FILTER(3)
      * 
@@ -169,12 +205,46 @@ class Guardian extends Component implements IGuardian
             }
         }
         
+        $this->doAction( self::ON_USER_CAN_ACTION );
+        
         return $this->filter( self::ON_USER_CAN_FILTER, $retVal, $user, $cap );
+    }
+    
+    /**
+     * Returns the pretty name for a role or capability.
+     * 
+     * @param string $name the role or capability name
+     * 
+     * @filter ON_GET_PRETTY_NAME_FILTER(2)
+     * 
+     * @return string prettified name
+     */
+    public function getPrettyName( $name )
+    {
+        $retVal = '';
+        
+        $tokens = explode( '_', $name );
+        
+        foreach( $tokens as $token )
+        {
+            $token = strtoupper( substr( $token, 0, 1 ) ) . substr( $token, 1 );
+            
+            $retVal .= $token . ' ';
+        }
+        
+        $retVal = trim( $retVal );
+        
+        return $this->filter( self::ON_GET_PRETTY_NAME_FILTER, $retVal, $name );
     }
     
     // actions
     const ON_INIT_ACTION                    = 'on_init_action';
+    const ON_GET_ROLE_ACTION                = 'on_get_role_action';
+    const ON_USER_CAN_ACTION                = 'on_user_can_action';
     
     // filters
+    const ON_GET_ROLE_FILTER                = 'on_get_role_filter';
+    const ON_GET_ROLES_FILTER               = 'on_get_roles_filter';
     const ON_USER_CAN_FILTER                = 'on_user_can_filter';
+    const ON_GET_PRETTY_NAME_FILTER         = 'on_get_pretty_name_filter';
 }

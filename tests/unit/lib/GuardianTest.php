@@ -129,6 +129,20 @@ class GuardianTest extends \PHPUnit_Framework_TestCase
     }
     
     /**
+     * Test getting role by name.
+     */
+    public function testGetRole( )
+    {
+        global $config;
+        
+        $this->guard->init( $config );
+        
+        $role = $this->guard->getRole( 'super_admin' );
+        
+        $this->assertEquals( 'super_admin', $role->name );
+    }
+    
+    /**
      * Test if user can add new users.
      */
     public function testUserCanAddUsers( )
@@ -136,7 +150,16 @@ class GuardianTest extends \PHPUnit_Framework_TestCase
         $user = new User();
         $user->roles[ ] = $this->_getRole( 'administrator' );
         
+        $this->markTestIncomplete( );
         //$this->assertFalse( $this->guard->userCan( $user, $cap))
+    }
+    
+    /**
+     * Test prettifying role name.
+     */
+    public function testPrettifyName( )
+    {
+        $this->assertEquals( 'Super Admin', $this->guard->getPrettyName( 'super_admin' ) );
     }
     
     /**
